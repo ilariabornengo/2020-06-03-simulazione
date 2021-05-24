@@ -5,9 +5,13 @@
 package it.polito.tdp.PremierLeague;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.PremierLeague.model.Model;
+import it.polito.tdp.PremierLeague.model.Opponent;
+import it.polito.tdp.PremierLeague.model.Player;
+import it.polito.tdp.PremierLeague.model.TopPlayer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -45,16 +49,56 @@ public class FXMLController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
 
+    	String numG=this.txtGoals.getText();
+    	Double numGI=0.0;
+    	try {
+    		numGI=Double.parseDouble(numG);
+    	}catch(NumberFormatException e)
+    	{
+    		e.printStackTrace();
+    	}
+    	this.model.creaGrafo(numGI);
+    	this.txtResult.appendText("GRAFO CREATO");
+    	
     }
 
     @FXML
     void doDreamTeam(ActionEvent event) {
-
+    	this.txtResult.clear();
+    	String numG=this.txtGoals.getText();
+    	Double numGI=0.0;
+    	String nGiocatori=this.txtK.getText();
+    	int nGiocatoriI=0;
+    	try {
+    	nGiocatoriI=Integer.parseInt(nGiocatori);	
+    	numGI=Double.parseDouble(numG);
+    	}catch(NumberFormatException e)
+    	{
+    		e.printStackTrace();
+    	}
+    	this.model.creaGrafo(numGI);
+    	List<Player> dreamTeam=this.model.getDreamteam(nGiocatoriI);
+    	this.txtResult.appendText("IL DREAMTEAM HA UN GRADO DI TITOLARITA' DI:"+this.model.getGradoTitolarita(dreamTeam)+"\n");
+    	this.txtResult.appendText("IL DREAMTEAM E' COMPOSTO DA: \n");
+    	for(Player p:dreamTeam)
+    	{
+    		this.txtResult.appendText(p.toString()+"\n");
+    	}
+    	
+    	
     }
 
     @FXML
     void doTopPlayer(ActionEvent event) {
 
+    	txtResult.clear();
+    	TopPlayer top=this.model.getBestPlayer();
+    	txtResult.appendText("IL TOP SCORER PER MINUTI GIOCATI E': "+top.getTopPlayer().toString()+"\n");
+    	txtResult.appendText("GIOCATORI BATTUTI IN ORDINE DI PERMANENZA IN CAMPO DECRESCENTE\n");
+    	for(Opponent o:top.getOpponents())
+    	{
+    		txtResult.appendText(o.toString()+"\n");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
