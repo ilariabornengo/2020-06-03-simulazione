@@ -44,7 +44,7 @@ public class Model {
 				//abbiamo un peso associato agli archi quindi devo verificare entrambi i casi, se è positivo o negativo
 				if(a.getPeso()<0)
 				{
-					Graphs.addEdge(this.grafo, a.getGiocatore1(), a.getGiocatore2(), ((double)-1)*a.getPeso());
+					Graphs.addEdge(this.grafo, a.getGiocatore2(), a.getGiocatore1(), ((double)-1)*a.getPeso());
 				}
 				else if(a.getPeso()>0)
 				{
