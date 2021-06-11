@@ -2,31 +2,31 @@ package it.polito.tdp.PremierLeague.model;
 
 public class Adiacenza {
 
-	Player giocatore1;
-	Player giocatore2;
-	int peso;
-	public Adiacenza(Player giocatore1, Player giocatore2, int peso) {
+	Player p1;
+	Player p2;
+	Integer peso;
+	public Adiacenza(Player p1, Player p2, Integer peso) {
 		super();
-		this.giocatore1 = giocatore1;
-		this.giocatore2 = giocatore2;
+		this.p1 = p1;
+		this.p2 = p2;
 		this.peso = peso;
 	}
-	public Player getGiocatore1() {
-		return giocatore1;
+	public Player getP1() {
+		return p1;
 	}
-	public void setGiocatore1(Player giocatore1) {
-		this.giocatore1 = giocatore1;
+	public void setP1(Player p1) {
+		this.p1 = p1;
 	}
-	public Player getGiocatore2() {
-		return giocatore2;
+	public Player getP2() {
+		return p2;
 	}
-	public void setGiocatore2(Player giocatore2) {
-		this.giocatore2 = giocatore2;
+	public void setP2(Player p2) {
+		this.p2 = p2;
 	}
-	public int getPeso() {
+	public Integer getPeso() {
 		return peso;
 	}
-	public void setPeso(int peso) {
+	public void setPeso(Integer peso) {
 		this.peso = peso;
 	}
 	

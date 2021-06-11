@@ -5,13 +5,15 @@
 package it.polito.tdp.PremierLeague;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.PremierLeague.model.Battuti;
 import it.polito.tdp.PremierLeague.model.Model;
-import it.polito.tdp.PremierLeague.model.Opponent;
+
 import it.polito.tdp.PremierLeague.model.Player;
-import it.polito.tdp.PremierLeague.model.TopPlayer;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -48,42 +50,39 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
-    	String numG=this.txtGoals.getText();
-    	Double numGI=0.0;
+    	txtResult.clear();
+    	String xS=this.txtGoals.getText();
+    	Double x=0.0;
     	try {
-    		numGI=Double.parseDouble(numG);
+    		x=Double.parseDouble(xS);
     	}catch(NumberFormatException e)
     	{
     		e.printStackTrace();
     	}
-    	this.model.creaGrafo(numGI);
-    	this.txtResult.appendText("GRAFO CREATO");
-    	
+    	this.model.creaGrafo(x);
+    	txtResult.appendText("GRAFO CREATO!!\n");
+    	txtResult.appendText("# vertici: "+this.model.getVertici()+"\n");
+    	txtResult.appendText("# archi: "+this.model.getArchi()+"\n");
     }
 
     @FXML
     void doDreamTeam(ActionEvent event) {
-    	this.txtResult.clear();
-    	String numG=this.txtGoals.getText();
-    	Double numGI=0.0;
-    	String nGiocatori=this.txtK.getText();
-    	int nGiocatoriI=0;
+    	txtResult.clear();
+    	String kS=this.txtK.getText();
+    	Integer k=0;
     	try {
-    	nGiocatoriI=Integer.parseInt(nGiocatori);	
-    	numGI=Double.parseDouble(numG);
+    		k=Integer.parseInt(kS);
     	}catch(NumberFormatException e)
     	{
     		e.printStackTrace();
     	}
-    	this.model.creaGrafo(numGI);
-    	List<Player> dreamTeam=this.model.getDreamteam(nGiocatoriI);
-    	this.txtResult.appendText("IL DREAMTEAM HA UN GRADO DI TITOLARITA' DI:"+this.model.getGradoTitolarita(dreamTeam)+"\n");
-    	this.txtResult.appendText("IL DREAMTEAM E' COMPOSTO DA: \n");
-    	for(Player p:dreamTeam)
+    	List<Player> best=new ArrayList<Player>(this.model.bestPlayer(k));
+    	txtResult.appendText("IL DREAMTEAM E' COMPOSTO DA:\n");
+    	for(Player p:best)
     	{
-    		this.txtResult.appendText(p.toString()+"\n");
+    	txtResult.appendText(p.toString()+"\n");
     	}
+    	txtResult.appendText("IL GRADO DI TITOLARITA' DELLA SQUADRA E': "+this.model.getGradoTit());
     	
     	
     }
@@ -92,12 +91,12 @@ public class FXMLController {
     void doTopPlayer(ActionEvent event) {
 
     	txtResult.clear();
-    	TopPlayer top=this.model.getBestPlayer();
-    	txtResult.appendText("IL TOP SCORER PER MINUTI GIOCATI E': "+top.getTopPlayer().toString()+"\n");
-    	txtResult.appendText("GIOCATORI BATTUTI IN ORDINE DI PERMANENZA IN CAMPO DECRESCENTE\n");
-    	for(Opponent o:top.getOpponents())
+    	Player best=this.model.getBestPlayer();
+    	List <Battuti> lista=new ArrayList<Battuti>(this.model.getBattuti(best));
+    	txtResult.appendText("IL TOP PLAYER E': "+best.toString()+" E HA BATTUTO:\n");
+    	for(Battuti b:lista)
     	{
-    		txtResult.appendText(o.toString()+"\n");
+    		txtResult.appendText(b.getBattuto().toString()+" - "+b.getPeso()+"\n");
     	}
     }
 
