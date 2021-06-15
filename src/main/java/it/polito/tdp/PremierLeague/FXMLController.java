@@ -51,39 +51,36 @@ public class FXMLController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	String xS=this.txtGoals.getText();
-    	Double x=0.0;
+    	String xs=this.txtGoals.getText();
+    	double x=0.0;
     	try {
-    		x=Double.parseDouble(xS);
+    		x=Double.parseDouble(xs);
     	}catch(NumberFormatException e)
     	{
     		e.printStackTrace();
     	}
     	this.model.creaGrafo(x);
-    	txtResult.appendText("GRAFO CREATO!!\n");
-    	txtResult.appendText("# vertici: "+this.model.getVertici()+"\n");
+    	txtResult.appendText("GRAFO CREATO!\n");
+    	txtResult.appendText("# vertici: "+this.model.getVertci()+"\n");
     	txtResult.appendText("# archi: "+this.model.getArchi()+"\n");
     }
 
     @FXML
     void doDreamTeam(ActionEvent event) {
     	txtResult.clear();
-    	String kS=this.txtK.getText();
+    	String ks=this.txtK.getText();
     	Integer k=0;
     	try {
-    		k=Integer.parseInt(kS);
+    		k=Integer.parseInt(ks);
     	}catch(NumberFormatException e)
     	{
     		e.printStackTrace();
     	}
-    	List<Player> best=new ArrayList<Player>(this.model.bestPlayer(k));
-    	txtResult.appendText("IL DREAMTEAM E' COMPOSTO DA:\n");
-    	for(Player p:best)
+    	List<Player> ricorsione=new ArrayList<Player>(k);
+    	for(Player p:ricorsione)
     	{
-    	txtResult.appendText(p.toString()+"\n");
+    		txtResult.appendText(p.toString()+"\n");
     	}
-    	txtResult.appendText("IL GRADO DI TITOLARITA' DELLA SQUADRA E': "+this.model.getGradoTit());
-    	
     	
     }
 
@@ -91,12 +88,13 @@ public class FXMLController {
     void doTopPlayer(ActionEvent event) {
 
     	txtResult.clear();
-    	Player best=this.model.getBestPlayer();
-    	List <Battuti> lista=new ArrayList<Battuti>(this.model.getBattuti(best));
-    	txtResult.appendText("IL TOP PLAYER E': "+best.toString()+" E HA BATTUTO:\n");
-    	for(Battuti b:lista)
+    	Player best=this.model.getMigliore();
+    	List<Battuti> listaBest=new ArrayList<Battuti>(this.model.battuti(best));
+    	txtResult.appendText("IL TOP PLAYER E': "+best.toString()+"\n");
+    	txtResult.appendText("I GIOCATORI BATTUTI IN ORDINE DI PESO DECRESCENTE SONO:\n");
+    	for(Battuti b:listaBest)
     	{
-    		txtResult.appendText(b.getBattuto().toString()+" - "+b.getPeso()+"\n");
+    		txtResult.appendText(b.toString()+"\n");
     	}
     }
 
