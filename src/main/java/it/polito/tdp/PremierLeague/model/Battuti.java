@@ -23,8 +23,7 @@ public class Battuti {
 	}
 	@Override
 	public String toString() {
-		return  p + " - " + peso;
+		return p + " - " + peso;
 	}
-	
 	
 }

@@ -1,7 +1,7 @@
 package it.polito.tdp.PremierLeague.model;
 
 public class Adiacenza {
-	
+
 	Player p1;
 	Player p2;
 	Integer peso;
@@ -30,6 +30,4 @@ public class Adiacenza {
 		this.peso = peso;
 	}
 	
-	
-
 }

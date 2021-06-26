@@ -51,36 +51,37 @@ public class FXMLController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	String xs=this.txtGoals.getText();
+    	String xS=this.txtGoals.getText();
     	double x=0.0;
     	try {
-    		x=Double.parseDouble(xs);
+    		x=Double.parseDouble(xS);
     	}catch(NumberFormatException e)
     	{
     		e.printStackTrace();
     	}
     	this.model.creaGrafo(x);
     	txtResult.appendText("GRAFO CREATO!\n");
-    	txtResult.appendText("# vertici: "+this.model.getVertci()+"\n");
+    	txtResult.appendText("# vertici: "+this.model.getVertici()+"\n");
     	txtResult.appendText("# archi: "+this.model.getArchi()+"\n");
     }
 
     @FXML
     void doDreamTeam(ActionEvent event) {
     	txtResult.clear();
-    	String ks=this.txtK.getText();
-    	Integer k=0;
+    	String KS=this.txtK.getText();
+    	Integer K=0;
     	try {
-    		k=Integer.parseInt(ks);
+    		K=Integer.parseInt(KS);
     	}catch(NumberFormatException e)
     	{
     		e.printStackTrace();
     	}
-    	List<Player> ricorsione=new ArrayList<Player>(k);
-    	for(Player p:ricorsione)
+    	List<Player> dt=new ArrayList<Player>(this.model.getDreamTeam(K));
+    	for(Player p:dt)
     	{
     		txtResult.appendText(p.toString()+"\n");
     	}
+    	
     	
     }
 
@@ -88,11 +89,10 @@ public class FXMLController {
     void doTopPlayer(ActionEvent event) {
 
     	txtResult.clear();
-    	Player best=this.model.getMigliore();
-    	List<Battuti> listaBest=new ArrayList<Battuti>(this.model.battuti(best));
-    	txtResult.appendText("IL TOP PLAYER E': "+best.toString()+"\n");
-    	txtResult.appendText("I GIOCATORI BATTUTI IN ORDINE DI PESO DECRESCENTE SONO:\n");
-    	for(Battuti b:listaBest)
+    	Player best=this.model.getBest();
+    	List<Battuti> batt=new ArrayList<Battuti>(this.model.giocatoribattuti(best));
+    	txtResult.appendText("IL BEST PLAYER E': "+best+" E HA BATTUTO:\n");
+    	for(Battuti b:batt)
     	{
     		txtResult.appendText(b.toString()+"\n");
     	}
