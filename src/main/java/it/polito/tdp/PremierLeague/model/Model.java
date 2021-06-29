@@ -16,22 +16,23 @@ import it.polito.tdp.PremierLeague.db.PremierLeagueDAO;
 public class Model {
 
 	PremierLeagueDAO dao;
-	Map<Integer,Player>idMap;
+	Map<Integer,Player> idMap;
 	Graph<Player,DefaultWeightedEdge>grafo;
-	List<Player> dreamTeam;
-	int gradoTito;
+	List<Player> listaBest;
+	public int gradoTit;
+	
 	public Model()
 	{
 		this.dao=new PremierLeagueDAO();
 	}
 	
-	public void creaGrafo(double avg)
+	public void creaGrafo(double goal)
 	{
 		this.idMap=new HashMap<Integer,Player>();
-		this.grafo= new SimpleDirectedWeightedGraph<Player,DefaultWeightedEdge>(DefaultWeightedEdge.class);
+		this.grafo=new SimpleDirectedWeightedGraph<Player,DefaultWeightedEdge>(DefaultWeightedEdge.class);
 		
 		//aggiungo i vertici
-		this.dao.getVertici(avg, idMap);
+		this.dao.getVertici(goal, idMap);
 		Graphs.addAllVertices(this.grafo, this.idMap.values());
 		
 		//aggiungo gli archi
@@ -39,143 +40,99 @@ public class Model {
 		{
 			if(this.grafo.vertexSet().contains(a.getP1()) && this.grafo.vertexSet().contains(a.getP2()))
 			{
-				if(a.getPeso()>0)
+				if(a.peso>0)
 				{
 					Graphs.addEdge(this.grafo, a.getP1(), a.getP2(), a.getPeso());
-				}else if(a.getPeso()<0)
+				}else if(a.peso<0)
 				{
 					Graphs.addEdge(this.grafo, a.getP2(), a.getP1(), (-1)*a.getPeso());
 				}
 			}
 		}
 	}
-	
-	public Player getBest()
+	public Player topPlayer()
 	{
-		int max=0;
+		int playerMax=0;
 		Player best=null;
+		
 		for(Player p:this.grafo.vertexSet())
 		{
-			if(this.grafo.outDegreeOf(p)>max)
+			if(this.grafo.outDegreeOf(p)>playerMax)
 			{
+				playerMax=this.grafo.outDegreeOf(p);
 				best=p;
-				max=this.grafo.outDegreeOf(p);
 			}
 		}
 		return best;
 	}
-	public List<Battuti> giocatoribattuti(Player p)
+	
+	public List<Adiacenza> battuti(Player p)
 	{
-		List<Battuti> si=new ArrayList<Battuti>();
+		List<Adiacenza> battuti=new ArrayList<Adiacenza>(); 
 		for(DefaultWeightedEdge d:this.grafo.outgoingEdgesOf(p))
 		{
-			Player p2=this.grafo.getEdgeTarget(d);
-			int peso=(int) this.grafo.getEdgeWeight(d);
-			Battuti b=new Battuti(p2,peso);
-			si.add(b);
+			Player altro=this.grafo.getEdgeTarget(d);
+			int peso=(int) this.grafo.getEdgeWeight(this.grafo.getEdge(p, altro));
+			Adiacenza a=new Adiacenza(p,altro,peso);
+			battuti.add(a);
 		}
-		Collections.sort(si, new ComparatorPeso());
-		return si;
-			
+		Collections.sort(battuti, new ComparatorDelta());
+		return battuti;
 	}
-	public List<Player> getDreamTeam(int K)
+	
+	public List<Player> percorsoBest(int k)
 	{
-		this.dreamTeam=new ArrayList<Player>();
+		this.listaBest=new ArrayList<Player>();
 		List<Player> parziale=new ArrayList<Player>();
-		List<Player> rimanenti=new ArrayList<Player>(this.grafo.vertexSet());
-		Player iniziale=this.bestGradTit(rimanenti);
-		parziale.add(iniziale);
-		List<Battuti> no=new ArrayList<Battuti>(this.giocatoribattuti(iniziale));
-		for(Battuti b:no)
-		{
-			rimanenti.remove(b.getP());
-		}
-		this.gradoTito=0;
-		ricorsione(parziale,rimanenti,K);
-		return this.dreamTeam;
+		this.gradoTit=0;
+		ricorsione(parziale,k);
+		return this.listaBest;
 	}
-	
-	public Player bestGradTit(List<Player> pla)
-	{
-		int pesoMax=0;
-		Player best=null;
-		for(Player p:pla)
-			{
-			int pesoU=0;
-			int pesoE=0;
-			int peso=0;
-			for(DefaultWeightedEdge d:this.grafo.outgoingEdgesOf(p))
-			{
-				pesoU+=this.grafo.getEdgeWeight(d);
-			}
-			for(DefaultWeightedEdge de:this.grafo.incomingEdgesOf(p))
-			{
-				pesoE+=this.grafo.getEdgeWeight(de);
-			}
-			peso=pesoU-pesoE;
-			if(peso>pesoMax)
-			{
-				pesoMax=peso;
-				best=p;
-			}
-		}
-		return best;
-	}
-	
-	
-	private void ricorsione(List<Player> parziale, List<Player> rimanenti, int k) {
+	private void ricorsione(List<Player> parziale, int k) {
 		if(parziale.size()==k)
 		{
-			int gradoTitol=calcolaTitolarita(parziale);
-			if(gradoTitol>this.gradoTito)
+			int grado=calcolaGrado(parziale);
+			if(grado>this.gradoTit)
 			{
-				this.dreamTeam=new ArrayList<Player>(parziale);
-				this.gradoTito=gradoTitol;
+				this.listaBest=new ArrayList<Player>(parziale);
+				this.gradoTit=grado;
 				return;
 			}
 		}
 		
-		Player ultimo=parziale.get(parziale.size()-1);
-		for(Player p:Graphs.neighborListOf(this.grafo, ultimo))
+		//fuori dal caso terminale
+		for(Player p:this.grafo.vertexSet())
 		{
 			if(!parziale.contains(p))
 			{
 				parziale.add(p);
-				List<Battuti> sconfitti=new ArrayList<Battuti>(this.giocatoribattuti(p));
-				for(Battuti b:sconfitti)
-				{
-					rimanenti.remove(b.getP());
-				}
-				ricorsione(parziale,rimanenti,k);
-				for(Battuti b:sconfitti)
-				{
-					rimanenti.add(b.getP());
-				}
+				ricorsione(parziale,k);
 				parziale.remove(p);
 			}
 		}
 		
 	}
 
-	private int calcolaTitolarita(List<Player> parziale) {
-		int peso=0;
+	private int calcolaGrado(List<Player> parziale) {
+		int gradoTot=0;
 		for(Player p:parziale)
 		{
-		int pesoU=0;
-		int pesoE=0;
-		
-		for(DefaultWeightedEdge d:this.grafo.outgoingEdgesOf(p))
-		{
-			pesoU+=this.grafo.getEdgeWeight(d);
+			int archiU=0;
+			int archiE=0;
+			int tot=0;
+			for(DefaultWeightedEdge d:this.grafo.outgoingEdgesOf(p))
+			{
+				archiU+=this.grafo.getEdgeWeight(d);
+			}
+			for(DefaultWeightedEdge de:this.grafo.incomingEdgesOf(p))
+			{
+				archiE+=this.grafo.getEdgeWeight(de);
+			}
+			tot=archiU-archiE;
+			gradoTot+=tot;
+			
 		}
-		for(DefaultWeightedEdge de:this.grafo.incomingEdgesOf(p))
-		{
-			pesoE+=this.grafo.getEdgeWeight(de);
-		}
-		peso+=pesoU-pesoE;
-		
-	}
-		return peso;
+		return gradoTot;
 	}
 
 	public int getVertici()

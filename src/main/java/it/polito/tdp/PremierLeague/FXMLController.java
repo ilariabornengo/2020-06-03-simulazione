@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import it.polito.tdp.PremierLeague.model.Battuti;
+import it.polito.tdp.PremierLeague.model.Adiacenza;
 import it.polito.tdp.PremierLeague.model.Model;
 
 import it.polito.tdp.PremierLeague.model.Player;
@@ -51,18 +51,24 @@ public class FXMLController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	String xS=this.txtGoals.getText();
-    	double x=0.0;
+    	String goalS=this.txtGoals.getText();
+    	double goal=0.0;
     	try {
-    		x=Double.parseDouble(xS);
+    		goal=Double.parseDouble(goalS);
     	}catch(NumberFormatException e)
     	{
     		e.printStackTrace();
     	}
-    	this.model.creaGrafo(x);
-    	txtResult.appendText("GRAFO CREATO!\n");
-    	txtResult.appendText("# vertici: "+this.model.getVertici()+"\n");
-    	txtResult.appendText("# archi: "+this.model.getArchi()+"\n");
+    	if(goalS==null)
+    	{
+    		txtResult.appendText("inserire testo\n");
+    	}else
+    	{
+    		this.model.creaGrafo(goal);
+    		txtResult.appendText("GRAFO CREATO!\n");
+    		txtResult.appendText("# vertici: "+this.model.getVertici()+"\n");
+    		txtResult.appendText("# archi: "+this.model.getArchi()+"\n");
+    	}
     }
 
     @FXML
@@ -76,12 +82,18 @@ public class FXMLController {
     	{
     		e.printStackTrace();
     	}
-    	List<Player> dt=new ArrayList<Player>(this.model.getDreamTeam(K));
-    	for(Player p:dt)
+    	if(KS==null)
     	{
-    		txtResult.appendText(p.toString()+"\n");
+    		txtResult.appendText("inserire un valore\n");
+    	}else
+    	{
+    		List<Player> best=new ArrayList<Player>(this.model.percorsoBest(K));
+    		txtResult.appendText("IL PERCORSO CHE MASSIMIZZA IL GRADO DI TITOLARITA' DI : "+this.model.gradoTit+" E' FORMATO DA:\n");
+    		for(Player p:best)
+    		{
+    			txtResult.appendText(p.toString()+"\n");
+    		}
     	}
-    	
     	
     }
 
@@ -89,13 +101,14 @@ public class FXMLController {
     void doTopPlayer(ActionEvent event) {
 
     	txtResult.clear();
-    	Player best=this.model.getBest();
-    	List<Battuti> batt=new ArrayList<Battuti>(this.model.giocatoribattuti(best));
-    	txtResult.appendText("IL BEST PLAYER E': "+best+" E HA BATTUTO:\n");
-    	for(Battuti b:batt)
+    	Player p=this.model.topPlayer();
+    	List<Adiacenza> battuti=new ArrayList<Adiacenza>(this.model.battuti(p));
+    	txtResult.appendText("IL TOP PLAYER E': "+p.toString()+" E HA BATTUTO:\n");
+    	for(Adiacenza a:battuti)
     	{
-    		txtResult.appendText(b.toString()+"\n");
+    		txtResult.appendText(a.getP2()+" - "+a.getPeso()+"\n");
     	}
+    	
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete

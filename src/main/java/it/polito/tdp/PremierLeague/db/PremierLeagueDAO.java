@@ -61,8 +61,9 @@ public class PremierLeagueDAO {
 			return null;
 		}
 	}
-	public void getVertici(double avg,Map<Integer,Player> idMap){
-		String sql = "SELECT p.PlayerID AS id, p.Name AS nome "
+	
+	public void getVertici(double goal,Map<Integer,Player> idMap){
+		String sql = "SELECT distinct p.PlayerID AS id, p.Name AS nome "
 				+ "FROM players p, actions a "
 				+ "WHERE p.PlayerID=a.PlayerID "
 				+ "GROUP BY p.PlayerID,p.Name "
@@ -72,7 +73,7 @@ public class PremierLeagueDAO {
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
-			st.setDouble(1, avg);
+			st.setDouble(1, goal);
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
 				if(!idMap.containsKey(res.getInt("id")))
@@ -90,31 +91,28 @@ public class PremierLeagueDAO {
 			
 		}
 	}
-
+	
 	public List<Adiacenza> getAdiacenze(Map<Integer,Player> idMap){
-		String sql = "SELECT a1.PlayerID AS id1, a2.PlayerID AS id2, (sum(a1.TimePlayed)-SUM(a2.TimePlayed)) AS peso "
+		String sql = "SELECT a1.PlayerID AS id1, a2.PlayerID AS id2, (sum(a1.TimePlayed)- sum(a2.TimePlayed)) AS peso "
 				+ "FROM actions a1, actions a2 "
-				+ "WHERE a1.TeamID!=a2.TeamID "
-				+ "AND a1.PlayerID> a2.PlayerID "
-				+ "AND a1.MatchID=a2.MatchID "
+				+ "WHERE a1.PlayerID>a2.PlayerID "
+				+ "AND a1.TeamID!=a2.TeamID "
 				+ "AND a1.`Starts`=a2.`Starts` "
 				+ "AND a1.`Starts`=1 "
-				+ "GROUP BY a1.PlayerID, a2.PlayerID "
-				+ "";
+				+ "AND a1.MatchID=a2.MatchID "
+				+ "GROUP BY a1.PlayerID, a2.PlayerID " ;
 		List<Adiacenza> result = new ArrayList<Adiacenza>();
 		Connection conn = DBConnect.getConnection();
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
-			
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
 				if(idMap.containsKey(res.getInt("id1")) && idMap.containsKey(res.getInt("id2")))
 				{
-					Adiacenza a=new Adiacenza (idMap.get(res.getInt("id1")),idMap.get(res.getInt("id2")),res.getInt("peso"));
+					Adiacenza a=new Adiacenza(idMap.get(res.getInt("id1")),idMap.get(res.getInt("id2")),res.getInt("peso"));
 					result.add(a);
 				}
-				
 			}
 			conn.close();
 			return result;
@@ -124,5 +122,4 @@ public class PremierLeagueDAO {
 			return null;
 		}
 	}
-	
 }
